@@ -12,7 +12,7 @@ This Teams App is used to display formatted code in Teams with Adaptive Card.
 
 # Features
 ## Link Unfurling
-- Github related URLs: Code Sharing Extension generated URLs, be like `https://github.com/chikaishiro/SJTU-project/blob/master/test.py#L1-L9&comment=a%20message%22`.
+- Github related URLs: Code Sharing Extension generated URLs, be like `https://github.com/chikaishiro/SJTU-project/blob/master/test.py#L1-L9&xxxx`.
 - (Archived) Self-built endpoint related URLs: be like `https://myexample.yty.com/share/BVirGY7V`
 - (Archived) PR related URLs: be like `https://github.com/chikaishiro/SJTU-project/pull/1`.
 

@@ -163,7 +163,7 @@ function renderWithLib(contentToRender:string){
 async function renderWithGithubMdAPI(contentToRender:string){
     //const GithubToken = getGitHubToken();
     var html = await axios({
-        baseURL: "https://api.github.com/markdown",
+        baseURL: 'https://api.github.com/markdown',
         method: 'post',
         headers: {
             'Accept':'application/vnd.github+json'
@@ -188,10 +188,11 @@ async function renderWithGithubMdAPI(contentToRender:string){
  async function renderCodeWithAPI(contentToRender:string){
     console.log(contentToRender)
     var content = await axios({
-        baseURL: "http://hilite.me/api",
+        baseURL: 'http://hilite.me/api',
         method: 'get',
         params:{
-            "code":contentToRender
+            'code': contentToRender,
+            'style': 'emacs'
         }
     }).then( (response) => {
         return response.data;     

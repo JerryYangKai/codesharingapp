@@ -1,6 +1,7 @@
 import axios  from "axios";
 import { Buffer } from 'buffer';
 import { CodeCard } from "./codeCard";
+import { DefaultLineSetting } from "./constant";
 
 /**
  * 
@@ -9,31 +10,33 @@ import { CodeCard } from "./codeCard";
  * @returns 
  */
 export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: boolean){
-    // Typically, An Endpoint-generated GitHub-related URL be like `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6&xxx`
-    if (url.includes("&")){
-        const tempList = url.split("&");
-        url = tempList[0];
+    // Typically, An Endpoint-generated GitHub-related URL will be 
+    // `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b` 
+    // Or `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py?x=a&y=b`
+    if (url.includes("?")){
+        url = url.split("?")[0];
     }
-    if (!url.includes("#")){
-        return undefined;
+    let fileurl = url;
+    let startLine = DefaultLineSetting.defaultStartLine;
+    let endLine = DefaultLineSetting.defaultEndLine;
+    // If the Url specified the startLine and endLine
+    if (url.includes("#")){
+        const segmentListSharp = url.split("#");
+        // `lines` is `L1-L6`
+        const lines = segmentListSharp[1];
+        const lineNumList = lines.replace(/L/g,"").split("-");
+        // Get startLine and endLine
+        startLine = Number(lineNumList[0]) -1;
+        endLine = Number(lineNumList[1]) -1;  
+        fileurl = segmentListSharp[0]
     }
-    
-    // Now the URL will be like `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6`
-    const segmentListSharp = url.split("#");
-    // `lines` be like `L1-L6`
-    const lines = segmentListSharp[1];
-    const lineNumList = lines.replace(/L/g,"").split("-");
-    // Get startLine and endLine, since we need offset in the list, so -1 is needed.
-    const startLine = Number(lineNumList[0]) -1;
-    const endLine = Number(lineNumList[1]) -1;
-    // `segmentListSharp[0]` be like `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py
-    const segmentList = segmentListSharp[0].replace("https://github.com/","").replace("blob/","").split("/");
-    // user name is the first element of the segmentList.
+    const segmentList = fileurl.replace("https://github.com/","").replace("blob/","").split("/");
+    // name space is the first element of the segmentList.
     const namespace = segmentList.shift();
     // repo name is the second element of the segmentList.
     const repoName = segmentList.shift();
-    // branch name is the third part of the segmentList.
-    const branch = segmentList.shift();
+    // ref is the third part of the segmentList, ref means the name of the commit/branch/tag.
+    const ref = segmentList.shift();
     // connect the remaining part to get file path.
     const path = segmentList.reduce((a,b) => a + "/" + b);
    
@@ -41,13 +44,13 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
     // Use third-part API/lib to render code to HTML.
     if (!useGithubRendered){
         // Request whole content from GitHub API with metadata.
-        const rawContent = await reqInfoFromGitHubAPI(namespace, repoName, path, branch);
+        const rawContent = await reqInfoFromGitHubAPI(namespace, repoName, path, ref);
         // Get certain lines of code.
         const contentToRender = segmentContent(rawContent, startLine, endLine);
-        // Get language type from file path, only supports Python and Markdown in the demo.
+        // Get language type from file path
         const language = getLanguage(path);
         // Render content to HTML by its language type.
-        content = await renderContent(language,contentToRender);
+        content = await renderContent(language, contentToRender);
     }
     // Directly use GitHub-rendered HTML of the file.
     // Notice: No syntax-highlighting; Hard to get certain lines of code from rendered HTML.
@@ -55,7 +58,7 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
         content = await reqRenderedHTMLFromGitHub(namespace, repoName, path);
     }
 
-    var card = new CodeCard(`[${branch}]${namespace}/${repoName}/${path}: Lines ${startLine+1} - ${endLine+1}`, content, "github", url);
+    var card = new CodeCard(`[${ref}]${namespace}/${repoName}/${path}: Lines ${startLine+1} - ${endLine+1}`, content, url);
     return card;
 }
 
@@ -64,13 +67,13 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
  * @param namespace namespace
  * @param repoName name of the repository
  * @param path path of the file
- * @param branch name of the branch
+ * @param ref name of the commit/branch/tag
  * @returns raw content string of the file
  */
- async function reqInfoFromGitHubAPI(namespace: string, repoName: string, path: string, branch: string){
-    const GithubToken = getGitHubToken();
-    if (branch == undefined){
-        branch = 'main'
+ async function reqInfoFromGitHubAPI(namespace: string, repoName: string, path: string, ref: string){
+    //const GithubToken = getGitHubToken();
+    if (ref == undefined){
+        ref = 'main'
     }
     const reqURL = `https://api.github.com/repos/${namespace}/${repoName}/contents/${path}`;
     var content:string;
@@ -78,11 +81,12 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
         baseURL: reqURL,
         method: 'get',
         headers: {
-            'Accept':'application/vnd.github+json',
-            'Authorization':GithubToken
+            'Accept':'application/vnd.github+json'
+            //,
+            //'Authorization':GithubToken
         },
         params:{
-            'ref': branch
+            'ref': ref
         }
     }).then( (response) => {
         // Need to decode with base64
@@ -110,16 +114,15 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
 
 /**
  * Naive function to get language type from file suffix.
- * Only supports markdown and python now.
  * @param path path of the file
  * @returns language type of the file
  */
 function getLanguage(path:string){
-    if (path.includes(".md")){
-        return 'md';
+    if (path.endsWith(".md")){
+        return 'markdown';
     }
     else {
-        return 'py'
+        return 'code'
     }
 }
 
@@ -132,11 +135,11 @@ function getLanguage(path:string){
 async function renderContent(language:string, contentToRender:string){
     // For MarkDown, GitHub provided API to render. 
     // Render with lib and GitHub API are both implemented.
-    if (language === 'md'){
+    if (language === 'markdown'){
         //return renderWithLib(contentToRender);
         return renderWithGithubMdAPI(contentToRender);
     }
-    // Python rendering.
+    // Code rendering.
     else{
         return renderCodeWithAPI(contentToRender);
     }
@@ -158,13 +161,14 @@ function renderWithLib(contentToRender:string){
  * @returns HTML string of the content.
  */
 async function renderWithGithubMdAPI(contentToRender:string){
-    const GithubToken = getGitHubToken();
+    //const GithubToken = getGitHubToken();
     var html = await axios({
         baseURL: "https://api.github.com/markdown",
         method: 'post',
         headers: {
-            'Accept':'application/vnd.github+json',
-            'Authorization': GithubToken
+            'Accept':'application/vnd.github+json'
+            //,
+            //'Authorization': GithubToken
         },
         data:{
             'text': contentToRender
@@ -177,7 +181,7 @@ async function renderWithGithubMdAPI(contentToRender:string){
 
 /**
  * Function to render code with API.
- * This function only renders Python code content.
+ * Only support Python .
  * @param contentToRender content to be rendered.
  * @returns HTML string of the content.
  */
@@ -192,7 +196,7 @@ async function renderWithGithubMdAPI(contentToRender:string){
     }).then( (response) => {
         return response.data;     
     });
-    console.log(content);
+    // console.log(content);
     return content;
 }
 
@@ -226,6 +230,6 @@ async function renderWithGithubMdAPI(contentToRender:string){
  * @returns github token for authorization.
  */
 function getGitHubToken(){
-    const GitHubToken = `token ${process.env.GITHUB_TOKEN}`;
+    const GitHubToken = `Bearer ${process.env.GITHUB_TOKEN}`;
     return GitHubToken;
 }

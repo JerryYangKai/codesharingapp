@@ -10,7 +10,7 @@ import { DefaultLineSetting } from "./constant";
  * @returns 
  */
 export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: boolean){
-    // Typically, An GitHub code permlink URL will be 
+    // Typically, An GitHub code permalink URL will be 
     // `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b` 
     // Or `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py?x=a&y=b`
     if (url.includes("?")){

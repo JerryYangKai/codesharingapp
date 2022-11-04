@@ -12,7 +12,7 @@ export class CodeSharingBot extends TeamsActivityHandler {
   public async handleTeamsAppBasedLinkQuery(context: TurnContext, query: any): Promise<any> {
     // Link obtained has `amp;` in the url if the url contains `&`, simply replace it.
     const url = query.url.replace("amp;","");
-    // If URL contains `github`, use GitHub API route. Else sending request to self-built endpoint for data.
+    // Unfurling link contains `github`. 
     if (url.includes('github.com')){
       return await handleGitHubUrl(url);
     }
@@ -44,14 +44,13 @@ async function createCardCommand(context: TurnContext, action: any): Promise<any
 
 /**
  * Function to get attachment for link unfurling displaying.
- * @param url url from VSCode Extension which contains `github`
+ * @param url
  * @returns composeExtension for link unfurling displaying.
  */
 async function handleGitHubUrl(url: string){
   var card: Attachment;
   // Option to choose whether to use GitHub self-rendered HTML or not.
-  var useGitHubRenderedHtml = false;
-  const codeCard: CodeCard =  await reqCodeDataFromGitHubAPI(url, useGitHubRenderedHtml);
+  const codeCard: CodeCard =  await reqCodeDataFromGitHubAPI(url, false);
   if (codeCard == undefined){
     return;
   }

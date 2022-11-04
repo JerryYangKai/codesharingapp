@@ -52,7 +52,7 @@
                     "value": {
                         "domains": [
                             "github.com",
-                            "msazure.visualstudio.com"
+                            "*.visualstudio.com"
                         ]
                     }
                 }

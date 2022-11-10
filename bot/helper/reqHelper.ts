@@ -13,6 +13,7 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
     // Typically, An GitHub code permalink URL will be 
     // `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b` 
     // Or `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py?x=a&y=b`
+    // TODO: using lib or regular expression handle the link
     if (url.includes("?")){
         url = url.split("?")[0];
     }
@@ -67,7 +68,7 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
  * @returns raw content string of the file
  */
  async function reqInfoFromGitHubAPI(namespace: string, repoName: string, path: string, ref: string){
-    if (ref == undefined){
+    if (!ref){
         ref = 'main'
     }
     const reqURL = `https://api.github.com/repos/${namespace}/${repoName}/contents/${path}`;
@@ -96,6 +97,7 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
  * @returns content string of certain lines of a file content
  */
  function segmentContent(content:string, startLine:number, endLine: number){
+    // TODO: using lib to get the selected lines
     var retLines:string[] = [];
     var segmentLines = content.split("\n");
     for (let i = startLine; i <= endLine; i++ ){

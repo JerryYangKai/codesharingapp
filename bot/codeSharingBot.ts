@@ -51,7 +51,7 @@ async function handleGitHubUrl(url: string){
   var card: Attachment;
   // Option to choose whether to use GitHub self-rendered HTML or not.
   const codeCard: CodeCard =  await reqCodeDataFromGitHubAPI(url, false);
-  if (codeCard == undefined){
+  if (!codeCard){
     return;
   }
   card = CardFactory.heroCard(

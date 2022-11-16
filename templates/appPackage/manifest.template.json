@@ -39,8 +39,8 @@
                     "parameters": [
                         {
                             "name": "URL",
-                            "title": "URL for code sharing",
-                            "description": "URL for code sharing, copied from GitHub or Azure DevOps",
+                            "title": "URL for code card",
+                            "description": "URL for code card, copied from GitHub or Azure DevOps",
                             "inputType": "text"
                         }
                     ]

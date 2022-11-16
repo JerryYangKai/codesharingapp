@@ -61,11 +61,17 @@ async function handleGitHubUrl(url: string){
       {
         title: 'View in Github',
         type: 'openurl',
-        value: codeCard.uri
+        value: codeCard.originUrl
+      },
+      {
+        title: 'Open in vscode.dev',
+        type: 'openurl',
+        value: codeCard.webEditorUrl
       }
     ]);
-  card.content.text = codeCard.text;
   card.content.title = codeCard.title;
+  card.content.subtitle = codeCard.subtitle;
+  card.content.text = codeCard.text;
   const attachment = { contentType: card.contentType, content: card.content, preview: card };
   
   return {

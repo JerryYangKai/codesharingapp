@@ -11,7 +11,7 @@ This Teams App is used to display formatted code in Teams with Adaptive Card.
 
 # Features
 ## Link Unfurling
-- Github related URLs: Code Sharing Extension generated URLs, it is like `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b`.
+- Github permalink: It is like `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b`.
 
 ## Create Card
 Find button `Create Card` in Message Extension App and click to enter the same URLs as above.

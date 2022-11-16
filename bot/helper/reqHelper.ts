@@ -55,7 +55,13 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
         content = await reqRenderedHTMLFromGitHub(namespace, repoName, path);
     }
 
-    var card = new CodeCard(`[${ref}]${namespace}/${repoName}/${path}: Lines ${startLine+1} - ${endLine+1}`, content, url);
+    var card = new CodeCard(
+        `${namespace}/${repoName}`,
+        `Sharing ${path} Lines ${startLine+1}-${endLine+1}`,
+        content,
+        url,
+        `https://vscode.dev/github/${namespace}/${repoName}/blob/${ref}/${path}#L${startLine+1}-L${endLine+1}`
+        );
     return card;
 }
 

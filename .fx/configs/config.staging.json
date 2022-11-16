@@ -7,7 +7,7 @@
             "full": "CodeCard"
         },
         "description": {
-            "short": "Sharing code in Teams card",
+            "short": "Sharing code card in Teams",
             "full": "Sharing GitHub link then unfurling to code card in Teams Message Box"
         },
         "icons": {

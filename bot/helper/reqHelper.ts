@@ -27,7 +27,7 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
         const lineNumList = lines.replace(/L/g,"").split("-");
         // Get startLine and endLine
         startLine = Number(lineNumList[0]) - 1;
-        endLine = (lineNumList.length == 1)? startLine + DefaultLineSetting.defaultExtendLines : Number(lineNumList[1]) - 1;
+        endLine = (lineNumList.length == 1)? startLine + endLine : Number(lineNumList[1]) - 1;
         fileurl = segmentListSharp[0]
     }
     const segmentList = fileurl.replace("https://github.com/","").replace("blob/","").split("/");
@@ -178,6 +178,7 @@ async function renderWithGithubMdAPI(contentToRender:string){
         method: 'get',
         params:{
             'code': contentToRender,
+            'lexer': 'ts',
             'style': 'emacs'
         }
     }).then( (response) => {

@@ -20,14 +20,14 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
     let fileurl = url;
     let startLine = DefaultLineSetting.defaultStartLine;
     let endLine = DefaultLineSetting.defaultEndLine;
-    // If the Url specified the startLine and endLine
+    // If the Url specified the Lines
     if (url.includes("#")){
         const segmentListSharp = url.split("#");
         const lines = segmentListSharp[1];
         const lineNumList = lines.replace(/L/g,"").split("-");
         // Get startLine and endLine
-        startLine = Number(lineNumList[0]) -1;
-        endLine = Number(lineNumList[1]) -1;  
+        startLine = Number(lineNumList[0]) - 1;
+        endLine = (lineNumList.length == 1)? startLine + DefaultLineSetting.defaultExtendLines : Number(lineNumList[1]) - 1;
         fileurl = segmentListSharp[0]
     }
     const segmentList = fileurl.replace("https://github.com/","").replace("blob/","").split("/");

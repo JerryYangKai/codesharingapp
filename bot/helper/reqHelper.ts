@@ -6,10 +6,10 @@ import { DefaultLineSetting } from "./constant";
 /**
  * 
  * @param url GitHub-related url
- * @param useGithubRendered option to choose whether to get rendered HTML directly from GitHub
+ * @param useGitHubRendered option to choose whether to get rendered HTML directly from GitHub
  * @returns 
  */
-export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: boolean){
+export async function reqCodeDataFromGitHubAPI(url: string, useGitHubRendered: boolean){
     // Typically, An GitHub code permalink URL will be 
     // `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b` 
     // Or `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py?x=a&y=b`
@@ -42,7 +42,7 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
    
     var content: string;
     // Use third-part API to render code to HTML.
-    if (!useGithubRendered){
+    if (!useGitHubRendered){
         // Request whole content from GitHub API with metadata.
         const rawContent = await reqInfoFromGitHubAPI(namespace, repoName, path, ref);
         const contentToRender = segmentContent(rawContent, startLine, endLine);
@@ -107,7 +107,9 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGithubRendered: b
     var retLines:string[] = [];
     var segmentLines = content.split("\n");
     for (let i = startLine; i <= endLine; i++ ){
-        retLines.push(segmentLines[i]);
+        if (segmentLines[i]) {
+            retLines.push(segmentLines[i]);
+        }
     }
     // Reduce them to a string connected with `\n`.
     return retLines.reduce((a,b)=>a+"\n"+b);
@@ -136,7 +138,7 @@ function getLanguage(path:string){
 async function renderContent(language:string, contentToRender:string){
     // For MarkDown, GitHub provided API to render. 
     if (language === 'markdown'){
-        return renderWithGithubMdAPI(contentToRender);
+        return renderWithGitHubMdAPI(contentToRender);
     }
     // Code rendering.
     else{
@@ -149,7 +151,7 @@ async function renderContent(language:string, contentToRender:string){
  * @param contentToRender MarkDown string to be rendered.
  * @returns HTML string of the content.
  */
-async function renderWithGithubMdAPI(contentToRender:string){
+async function renderWithGitHubMdAPI(contentToRender:string){
     var html = await axios({
         baseURL: 'https://api.github.com/markdown',
         method: 'post',

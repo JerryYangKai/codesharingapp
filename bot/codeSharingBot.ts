@@ -59,13 +59,13 @@ async function handleGitHubUrl(url: string){
     undefined,
     [
       {
-        title: 'View in Github',
-        type: 'openurl',
+        title: 'View in GitHub',
+        type: 'openUrl',
         value: codeCard.originUrl
       },
       {
         title: 'Open in vscode.dev',
-        type: 'openurl',
+        type: 'openUrl',
         value: codeCard.webEditorUrl
       }
     ]);

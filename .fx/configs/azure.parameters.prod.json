@@ -4,7 +4,7 @@
   "parameters": {
     "provisionParameters": {
       "value": {
-        "resourceBaseName": "codesharindev0ce099",
+        "resourceBaseName": "codecardprod823ac1",
         "botAadAppClientId": "{{state.fx-resource-bot.botId}}",
         "botAadAppClientSecret": "{{state.fx-resource-bot.botPassword}}"
       }

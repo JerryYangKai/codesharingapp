@@ -34,13 +34,13 @@
                         "compose"
                     ],
                     "description": "Command to run action to create a Card from Compose Box",
-                    "title": "Code Sharintg",
+                    "title": "Code Card",
                     "type": "action",
                     "parameters": [
                         {
                             "name": "URL",
                             "title": "URL for code card",
-                            "description": "URL for code card, copied from GitHub or Azure DevOps",
+                            "description": "URL for code card, copied from GitHub permalink",
                             "inputType": "text"
                         }
                     ]

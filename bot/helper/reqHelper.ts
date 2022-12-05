@@ -9,7 +9,7 @@ import { DefaultLineSetting } from "./constant";
  * @param useGitHubRendered option to choose whether to get rendered HTML directly from GitHub
  * @returns 
  */
-export async function reqCodeDataFromGitHubAPI(url: string, useGitHubRendered: boolean){
+export async function reqCodeDataFromGitHubAPI(url: string){
     // Typically, An GitHub code permalink URL will be 
     // `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b` 
     // Or `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py?x=a&y=b`
@@ -41,19 +41,12 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGitHubRendered: b
     const path = segmentList.reduce((a,b) => a + "/" + b);
    
     var content: string;
-    // Use third-part API to render code to HTML.
-    if (!useGitHubRendered){
-        // Request whole content from GitHub API with metadata.
-        const rawContent = await reqInfoFromGitHubAPI(namespace, repoName, path, ref);
-        const contentToRender = segmentContent(rawContent, startLine, endLine);
-        const language = getLanguage(path);
-        content = await renderContent(language, contentToRender);
-    }
-    // Directly use GitHub-rendered HTML of the file.
-    // Notice: No syntax-highlighting; Hard to get certain lines of code from rendered HTML.
-    else {
-        content = await reqRenderedHTMLFromGitHub(namespace, repoName, path);
-    }
+    // Use third-part API to render code to HTML
+    // Request whole content from GitHub API with metadata.
+    const rawContent = await reqInfoFromGitHubAPI(namespace, repoName, path, ref);
+    const contentToRender = segmentContent(rawContent, startLine, endLine);
+    const language = getLanguage(path);
+    content = await renderContent(language, contentToRender);
 
     var card = new CodeCard(
         `${namespace}/${repoName}`,
@@ -91,6 +84,71 @@ export async function reqCodeDataFromGitHubAPI(url: string, useGitHubRendered: b
     }).then( (response) => {
         // Need to decode with base64
         content = Buffer.from(response.data["content"],'base64').toString('utf-8');    
+    });
+    return content;
+}
+
+/**
+ * 
+ * @param url GitHub-related url
+ * @param useGitHubRendered option to choose whether to get rendered HTML directly from GitHub
+ * @returns 
+ */
+ export async function reqCodeDataFromAzDOAPI(url: string){
+    // Typically, An Azure DevOps link URL will be 
+    // `https://org.visualstudio.com/project/_git/repo?path=&version=&line=&lineEnd=` 
+    // TODO: using lib or regular expression handle the link
+    const urlInstance = new URL(url);
+    const urlParams = urlInstance.searchParams;
+    // version means the name of the commit/branch, commit starts with 'GC', branch starts with 'GB'.
+    const version = urlParams.get('version') ? urlParams.get('version'): 'GBmain';
+    // ref means the real name of the commit/branch/tag.
+    const ref = version.substring(2);
+    const path = urlParams.get('path');
+    const startLine = urlParams.get('line') ? Number(urlParams.get('line')) - 1 : DefaultLineSetting.defaultStartLine;
+    const endLine = urlParams.get('lineEnd') ? Number(urlParams.get('lineEnd')) - 1 : DefaultLineSetting.defaultEndLine;
+    const orgName = urlInstance.hostname.split('.')[0];
+    const projectName = urlInstance.pathname.split('/')[1];
+    const repoName = urlInstance.pathname.split('/')[3];
+
+    var content: string;
+    // Use third-part API to render code to HTML
+    // Request whole content from GitHub API with metadata.
+    const rawContent = await reqInfoFromAzDOAPI(orgName, projectName, repoName, path, ref);
+    const contentToRender = segmentContent(rawContent, startLine, endLine);
+    const language = getLanguage(path);
+    content = await renderContent(language, contentToRender);
+
+    var card = new CodeCard(
+        `${orgName}/${projectName}/${repoName}`,
+        `Sharing ${path} Lines ${startLine+1}-${endLine+1}`,
+        content,
+        url,
+        `https://vscode.dev/azurerepos/${orgName}/${projectName}/${repoName}?version=${version}&path=${path}&line=${startLine+1}&lineEnd=${endLine+1}`
+        );
+    return card;
+}
+
+/**
+ * Function to request file data from GitHub API.
+ * @param namespace namespace
+ * @param repoName name of the repository
+ * @param path path of the file
+ * @param ref name of the commit/branch/tag
+ * @returns raw content string of the file
+ */
+ async function reqInfoFromAzDOAPI(orgName: string, projectName : string, repoName: string, path: string, ref: string){
+    const token = getAzDOToken();
+    const reqURL = `https://dev.azure.com/${orgName}/${projectName}/_apis/sourceProviders/TfsGit/filecontents?repository=${repoName}&commitOrBranch=${ref}&path=${path}&api-version=7.1-preview.1`;
+    var content:string;
+    await axios({
+        baseURL: reqURL,
+        method: 'get',
+        headers: {
+            'Authorization':'token'
+        },
+    }).then( (response) => {
+        content = response.data;    
     });
     return content;
 }
@@ -191,23 +249,11 @@ async function renderWithGitHubMdAPI(contentToRender:string){
 }
 
 /**
- * Function to request rendered HTML of GitHub content.
- * @param namespace namespace
- * @param repoName name of the repository
- * @param path path of the file
- * @returns HTML string of the content
+ * Function to get Azure DevOps Token from process.env
+ * Set in `.env.teamsfx.local`
+ * @returns github token for authorization.
  */
- async function reqRenderedHTMLFromGitHub(namespace: string, repoName: string, path: string){
-    const reqURL = `https://api.github.com/repos/${namespace}/${repoName}/contents/${path}`;
-    var content = await axios({
-        baseURL: reqURL,
-        method: 'get',
-        // The value of the field `Accept` is required to be set to `application/vnd.github.VERSION.html` to get GitHub-rendered HTML.
-        headers: {
-            'Accept':'application/vnd.github.VERSION.html'
-        },
-    }).then( (response) => {
-        return response.data;
-    });
-    return content;
+ function getAzDOToken(){
+    const accessToken = `Basic ${process.env.AzDO_TOKEN}`;
+    return accessToken;
 }

@@ -14,7 +14,7 @@ export class CodeSharingBot extends TeamsActivityHandler {
 
   public async handleTeamsAppBasedLinkQuery(context: TurnContext, query: any): Promise<any> {
     // Link obtained has `amp;` in the url if the url contains `&`, simply replace it.
-    const url = query.url.replace("amp;","");
+    const url = query.url.replace(/&amp;/g,'&');
     // Unfurling link contains `github`. 
     if (url.includes('github.com')){
       return await handleGitHubUrl(url);

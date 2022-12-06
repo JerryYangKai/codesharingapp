@@ -120,11 +120,11 @@ export async function reqCodeDataFromGitHubAPI(url: string){
     content = await renderContent(language, contentToRender);
 
     var card = new CodeCard(
-        `${orgName}/${projectName}/${repoName}`,
+        `${decodeURI(orgName)}/${decodeURI(projectName)}/${decodeURI(repoName)}`,
         `Sharing ${path} Lines ${startLine+1}-${endLine+1}`,
         content,
         url,
-        `https://vscode.dev/azurerepos/${orgName}/${projectName}/${repoName}?version=${version}&path=${path}&line=${startLine+1}&lineEnd=${endLine+1}`
+        `https://vscode.dev/azurerepos/${orgName}/${projectName}/${repoName}?version=${version}&path=${path}&line=${startLine+1}&lineEnd=${endLine+2}`
         );
     return card;
 }
@@ -145,7 +145,7 @@ export async function reqCodeDataFromGitHubAPI(url: string){
         baseURL: reqURL,
         method: 'get',
         headers: {
-            'Authorization':'token'
+            'Authorization': token
         },
     }).then( (response) => {
         content = response.data;    

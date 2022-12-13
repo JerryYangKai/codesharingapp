@@ -239,7 +239,7 @@ async function renderWithGitHubMdAPI(contentToRender:string){
         params:{
             'code': contentToRender,
             'lexer': 'ts',
-            'style': 'emacs'
+            'style': 'borland'
         }
     }).then( (response) => {
         return response.data;     

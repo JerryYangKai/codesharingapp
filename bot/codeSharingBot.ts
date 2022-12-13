@@ -19,9 +19,9 @@ export class CodeSharingBot extends TeamsActivityHandler {
     if (url.includes('github.com')){
       return await handleGitHubUrl(url);
     } 
-    else if (url.includes('.visualstudio.com')){
-      return await handleAzDOUrl(url);
-    }
+    // else if (url.includes('.visualstudio.com')){
+    //   return await handleAzDOUrl(url);
+    // }
   }
 
   // Using Action as a backup.
@@ -46,9 +46,9 @@ async function createCardCommand(context: TurnContext, action: any): Promise<any
   if (url.includes('github.com')){
     return await handleGitHubUrl(url);
   }    
-  else if (url.includes('.visualstudio.com')){
-    return await handleAzDOUrl(url);
-  }
+  // else if (url.includes('.visualstudio.com')){
+  //   return await handleAzDOUrl(url);
+  // }
 }
 
 /**

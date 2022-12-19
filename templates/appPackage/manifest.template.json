@@ -51,8 +51,7 @@
                     "type": "link",
                     "value": {
                         "domains": [
-                            "github.com",
-                            "*.visualstudio.com"
+                            "github.com"
                         ]
                     }
                 }

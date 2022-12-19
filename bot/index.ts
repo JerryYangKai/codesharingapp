@@ -53,3 +53,8 @@ server.post("/api/messages", async (req, res) => {
     await bot.run(context);
   });
 });
+
+// Health check
+server.get('/api/health', (req, res) => {
+  res.send('OK').status(200);
+});

@@ -6,8 +6,7 @@ import {
 } from "botbuilder";
 import { CodeCard } from "./helper/codeCard";
 import { 
-  reqCodeDataFromGitHubAPI,
-  reqCodeDataFromAzDOAPI,
+  reqCodeDataFromGitHubAPI
  } from "./helper/reqHelper";
 
 export class CodeSharingBot extends TeamsActivityHandler {
@@ -19,9 +18,6 @@ export class CodeSharingBot extends TeamsActivityHandler {
     if (url.includes('github.com')){
       return await handleGitHubUrl(url);
     } 
-    // else if (url.includes('.visualstudio.com')){
-    //   return await handleAzDOUrl(url);
-    // }
   }
 
   // Using Action as a backup.
@@ -45,10 +41,7 @@ async function createCardCommand(context: TurnContext, action: any): Promise<any
   // If URL contains `github`, use GitHub API route.
   if (url.includes('github.com')){
     return await handleGitHubUrl(url);
-  }    
-  // else if (url.includes('.visualstudio.com')){
-  //   return await handleAzDOUrl(url);
-  // }
+  }
 }
 
 /**
@@ -69,46 +62,6 @@ async function handleGitHubUrl(url: string){
     [
       {
         title: 'View in GitHub',
-        type: 'openUrl',
-        value: codeCard.originUrl
-      },
-      {
-        title: 'Open in vscode.dev',
-        type: 'openUrl',
-        value: codeCard.webEditorUrl
-      }
-    ]);
-  card.content.title = codeCard.title;
-  card.content.subtitle = codeCard.subtitle;
-  card.content.text = codeCard.text;
-  const attachment = { contentType: card.contentType, content: card.content, preview: card };
-  
-  return {
-    composeExtension: {
-      type: "result",
-      attachmentLayout: "list",
-      attachments: [attachment],
-    },
-  };
-}
-
-/**
- * Function to get attachment for link unfurling displaying.
- * @param url
- * @returns composeExtension for link unfurling displaying.
- */
- async function handleAzDOUrl(url: string){
-  var card: Attachment;
-  const codeCard: CodeCard =  await reqCodeDataFromAzDOAPI(url);
-  if (!codeCard){
-    return;
-  }
-  card = CardFactory.heroCard(
-    '',
-    undefined,
-    [
-      {
-        title: 'View in Azure DevOps',
         type: 'openUrl',
         value: codeCard.originUrl
       },

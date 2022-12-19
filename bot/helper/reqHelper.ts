@@ -89,71 +89,6 @@ export async function reqCodeDataFromGitHubAPI(url: string){
 }
 
 /**
- * 
- * @param url GitHub-related url
- * @param useGitHubRendered option to choose whether to get rendered HTML directly from GitHub
- * @returns 
- */
- export async function reqCodeDataFromAzDOAPI(url: string){
-    // Typically, An Azure DevOps link URL will be 
-    // `https://org.visualstudio.com/project/_git/repo?path=&version=&line=&lineEnd=` 
-    // TODO: using lib or regular expression handle the link
-    const urlInstance = new URL(url);
-    const urlParams = urlInstance.searchParams;
-    // version means the name of the commit/branch, commit starts with 'GC', branch starts with 'GB'.
-    const version = urlParams.get('version') ? urlParams.get('version'): 'GBmain';
-    // ref means the real name of the commit/branch/tag.
-    const ref = version.substring(2);
-    const path = urlParams.get('path');
-    const startLine = urlParams.get('line') ? Number(urlParams.get('line')) - 1 : DefaultLineSetting.defaultStartLine;
-    const endLine = urlParams.get('lineEnd') ? Number(urlParams.get('lineEnd')) - 1 : DefaultLineSetting.defaultEndLine;
-    const orgName = urlInstance.hostname.split('.')[0];
-    const projectName = urlInstance.pathname.split('/')[1];
-    const repoName = urlInstance.pathname.split('/')[3];
-
-    var content: string;
-    // Use third-part API to render code to HTML
-    // Request whole content from GitHub API with metadata.
-    const rawContent = await reqInfoFromAzDOAPI(orgName, projectName, repoName, path, ref);
-    const contentToRender = segmentContent(rawContent, startLine, endLine);
-    const language = getLanguage(path);
-    content = await renderContent(language, contentToRender);
-
-    var card = new CodeCard(
-        `${decodeURI(orgName)}/${decodeURI(projectName)}/${decodeURI(repoName)}`,
-        `Sharing ${path} Lines ${startLine+1}-${endLine+1}`,
-        content,
-        url,
-        `https://vscode.dev/azurerepos/${orgName}/${projectName}/${repoName}?version=${version}&path=${path}&line=${startLine+1}&lineEnd=${endLine+2}`
-        );
-    return card;
-}
-
-/**
- * Function to request file data from GitHub API.
- * @param namespace namespace
- * @param repoName name of the repository
- * @param path path of the file
- * @param ref name of the commit/branch/tag
- * @returns raw content string of the file
- */
- async function reqInfoFromAzDOAPI(orgName: string, projectName : string, repoName: string, path: string, ref: string){
-    const token = getAzDOToken();
-    const reqURL = `https://dev.azure.com/${orgName}/${projectName}/_apis/sourceProviders/TfsGit/filecontents?repository=${repoName}&commitOrBranch=${ref}&path=${path}&api-version=7.1-preview.1`;
-    var content:string;
-    await axios({
-        baseURL: reqURL,
-        method: 'get',
-        headers: {
-            'Authorization': token
-        },
-    }).then( (response) => {
-        content = response.data;    
-    });
-    return content;
-}
-
-/**
  * Function to get certain lines of a file content.
  * @param content 
  * @param startLine the index of the starting line
@@ -246,14 +181,4 @@ async function renderWithGitHubMdAPI(contentToRender:string){
     });
     // console.log(content);
     return content;
-}
-
-/**
- * Function to get Azure DevOps Token from process.env
- * Set in `.env.teamsfx.local`
- * @returns github token for authorization.
- */
- function getAzDOToken(){
-    const accessToken = `Basic ${process.env.AzDO_TOKEN}`;
-    return accessToken;
 }

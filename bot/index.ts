@@ -1,3 +1,6 @@
+const appInsights = require('applicationinsights');
+appInsights.setup().start(); 
+
 // Import required packages
 import * as restify from "restify";
 
@@ -39,7 +42,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
 adapter.onTurnError = onTurnErrorHandler;
 
 // Create the bot that will handle incoming messages.
-const bot = new CodeSharingBot();
+const bot = new CodeSharingBot(appInsights.defaultClient);
 
 // Create HTTP server.
 const server = restify.createServer();

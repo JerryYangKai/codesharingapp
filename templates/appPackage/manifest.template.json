@@ -65,5 +65,9 @@
         "identity",
         "messageTeamMembers"
     ],
-    "validDomains": []
+    "validDomains": [
+        "app.vssps.visualstudio.com",
+        "codecardzhija60188bot.azurewebsites.net",
+        "*.ngrok.io"
+    ]
 }

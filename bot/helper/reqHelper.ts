@@ -204,8 +204,7 @@ function segmentContent(content: string, startLine: number, endLine: number) {
       retLines.push(segmentLines[i]);
     }
   }
-  // Reduce them to a string connected with `\n`.
-  return retLines.reduce((a, b) => a + "\n" + b);
+  return retLines.join("\n");
 }
 
 /**

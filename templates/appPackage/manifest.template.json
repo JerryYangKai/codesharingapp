@@ -66,8 +66,6 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "app.vssps.visualstudio.com",
-        "codecardzhija60188bot.azurewebsites.net",
-        "*.ngrok.io"
+        "{{state.fx-resource-bot.validDomain}}"
     ]
 }

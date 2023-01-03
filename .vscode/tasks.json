@@ -5,7 +5,6 @@
             "label": "Pre Debug Check & Start All",
             "dependsOn": [
                 "validate local prerequisites",
-                "start ngrok",
                 "prepare local environment",
                 "Start All"
             ],
@@ -18,10 +17,6 @@
             "presentation": {
                 "reveal": "never"
             }
-        },
-        {
-            "label": "start ngrok",
-            "dependsOn": "teamsfx: ngrok start"
         },
         {
             "label": "prepare local environment",

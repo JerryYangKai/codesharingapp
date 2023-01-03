@@ -3,7 +3,31 @@ This Teams App is used to display formatted code in Teams with Adaptive Card.
 
 # How to Run
 
-1. From Visual Studio Code: Start debugging the project by hitting the `F5` key in Visual Studio Code. Need Teams Toolkit extension installed.
+## Visual Studio Code
+1. Start ngrok.
+
+    ```
+    ngrok http 3978
+    ```
+
+1. Register Azure DevOps application for OAuth. https://app.vsaex.visualstudio.com/app/register.
+
+    ```
+    Application website: https://{uuid}.ngrok.io
+    Authorization callback URL: https://{uuid}.ngrok.io/auth-end.html
+    Authorized scopes: Code(read)
+    ```
+
+1. Configure bot endpoint and bot domain in `.env.teamsfx.local` file.
+
+    ```
+    APP_ID=
+    CLIENT_SECRET=
+    BOT_ENDPOINT=
+    BOT_DOMAIN=
+    ```
+
+1. Start debugging the project by hitting the `F5` key in Visual Studio Code. Need Teams Toolkit extension installed.
 
 # Note
 - API for code rendering: see in function `renderCodeWithAPI` in `reqHelper.ts`, modify to another API if needed.

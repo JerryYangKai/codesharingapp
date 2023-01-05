@@ -173,7 +173,7 @@ async function reqInfoFromAzDOAPI(
   ref: string,
   accessToken?: string
 ) {
-  const token = accessToken ?? getAzDOToken();
+  const token = `Bearer ${accessToken}` ?? getAzDOToken();
   const reqURL = `https://dev.azure.com/${orgName}/${projectName}/_apis/sourceProviders/TfsGit/filecontents?repository=${repoName}&commitOrBranch=${ref}&path=${path}&api-version=7.1-preview.1`;
   var content: string;
   await axios({

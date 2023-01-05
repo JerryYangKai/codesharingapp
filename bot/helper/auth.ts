@@ -3,10 +3,12 @@ import { MessagingExtensionResponse } from "botbuilder";
 
 const authConfig = {
   appId: process.env.APP_ID,
-  appSecret: process.env.CLIENT_SECRET,
+  clientSecret: process.env.CLIENT_SECRET,
   redirectUri: `${process.env.BOT_ENDPOINT}/auth-end.html`,
   initiateLoginEndpoint: `${process.env.BOT_ENDPOINT}/auth-start.html`,
 };
+
+export const scopes = ["vso.build"];
 
 export interface TokenRes {
   access_token: string;
@@ -28,17 +30,17 @@ export async function getAccessToken(code: string): Promise<TokenRes> {
   };
   return (await axios.post(
     "https://app.vssps.visualstudio.com/oauth2/token",
-    formatData(authConfig.appSecret, code, authConfig.redirectUri),
+    formatData(authConfig.clientSecret, code, authConfig.redirectUri),
     { headers: headers }
   )).data;
 }
 
 export function getSignInResponseForMessageExtension(
-  scopes: string[] | string
+  scopes: string[]
 ): MessagingExtensionResponse {
   const queryParam = {
     clientId: authConfig.appId,
-    scope: encodeURI([...scopes].join(" ")),
+    scope: [...scopes].join(" "),
   };
   const signInLink = `${authConfig.initiateLoginEndpoint}?${new URLSearchParams(
     queryParam

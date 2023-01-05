@@ -7,6 +7,7 @@ import {
 import {
   getAccessToken,
   getSignInResponseForMessageExtension,
+  scopes,
 } from "./helper/auth";
 import { CodeCard } from "./helper/codeCard";
 import {
@@ -27,7 +28,7 @@ export class CodeSharingBot extends TeamsActivityHandler {
     } else if (url.includes(".visualstudio.com")) {
       const valueObj = context.activity.value;
       if (!valueObj?.authentication?.token) {
-        return getSignInResponseForMessageExtension(["vso.code"]);
+        return getSignInResponseForMessageExtension(scopes);
       }
       return await handleAzDOUrl(url);
     }
@@ -60,7 +61,7 @@ async function createCardCommand(
   } else if (url.includes(".visualstudio.com")) {
     const valueObj = context.activity.value;
     if (!valueObj?.state) {
-      const res = getSignInResponseForMessageExtension(["vso.code"]);
+      const res = getSignInResponseForMessageExtension(scopes);
       return res;
     }
     const tokenRes = await getAccessToken(valueObj.state);

@@ -27,10 +27,13 @@ export class CodeSharingBot extends TeamsActivityHandler {
       return await handleGitHubUrl(url);
     } else if (url.includes(".visualstudio.com")) {
       const valueObj = context.activity.value;
-      if (!valueObj?.authentication?.token) {
-        return getSignInResponseForMessageExtension(scopes);
+      if (!valueObj?.state) {
+        const res = getSignInResponseForMessageExtension(scopes);
+        return res;
       }
-      return await handleAzDOUrl(url);
+      const tokenRes = await getAccessToken(valueObj.state);
+      const token = tokenRes.access_token;
+      return await handleAzDOUrl(url, token);
     }
   }
 

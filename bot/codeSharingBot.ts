@@ -4,7 +4,10 @@ import {
   TurnContext,
   Attachment,
 } from "botbuilder";
-import { getAccessToken, getSignInResponseForMessageExtension } from "./helper/auth";
+import {
+  getAccessToken,
+  getSignInResponseForMessageExtension,
+} from "./helper/auth";
 import { CodeCard } from "./helper/codeCard";
 import {
   reqCodeDataFromGitHubAPI,
@@ -60,7 +63,7 @@ async function createCardCommand(
       const res = getSignInResponseForMessageExtension(["vso.code"]);
       return res;
     }
-    const tokenRes = (await getAccessToken(valueObj.state));
+    const tokenRes = await getAccessToken(valueObj.state);
     const token = tokenRes.access_token;
     return await handleAzDOUrl(url, token);
   }

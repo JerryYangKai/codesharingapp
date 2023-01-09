@@ -3,7 +3,9 @@ import {
   CardFactory,
   TurnContext,
   Attachment,
+  CloudAdapter,
 } from "botbuilder";
+import { getToken } from "./helper/auth";
 import { CodeCard } from "./helper/codeCard";
 import {
   reqCodeDataFromGitHubAPI,
@@ -20,10 +22,37 @@ export class CodeSharingBot extends TeamsActivityHandler {
     // Unfurling link contains `github`.
     if (url.includes("github.com")) {
       return await handleGitHubUrl(url);
+    } else if (url.includes(".visualstudio.com")) {
+      const adapter = context.adapter as CloudAdapter;
+      const userTokenClient = context.turnState.get(adapter.UserTokenClientKey);
+      const tokenResponse = await getToken(context, query);
+
+      if (!tokenResponse || !tokenResponse.token) {
+        // There is no token, so the user has not signed in yet.
+
+        // Retrieve the OAuth Sign in Link to use in the MessagingExtensionResult Suggested Actions
+        const { signInLink } = await userTokenClient.getSignInResource(
+          process.env.ConnectionName,
+          context.activity
+        );
+
+        return {
+          composeExtension: {
+            type: "auth",
+            suggestedActions: {
+              actions: [
+                {
+                  type: "openUrl",
+                  value: signInLink,
+                  title: "Bot Service OAuth",
+                },
+              ],
+            },
+          },
+        };
+      }
+      return await handleAzDOUrl(url, tokenResponse.token);
     }
-    // else if (url.includes('.visualstudio.com')){
-    //   return await handleAzDOUrl(url);
-    // }
   }
 
   // Using Action as a backup.
@@ -50,10 +79,9 @@ async function createCardCommand(
   // If URL contains `github`, use GitHub API route.
   if (url.includes("github.com")) {
     return await handleGitHubUrl(url);
+  } else if (url.includes(".visualstudio.com")) {
+    return await handleAzDOUrl(url);
   }
-  // else if (url.includes('.visualstudio.com')){
-  //   return await handleAzDOUrl(url);
-  // }
 }
 
 /**
@@ -103,9 +131,9 @@ async function handleGitHubUrl(url: string) {
  * @param url
  * @returns composeExtension for link unfurling displaying.
  */
-async function handleAzDOUrl(url: string) {
+async function handleAzDOUrl(url: string, token?: string) {
   var card: Attachment;
-  const codeCard: CodeCard = await reqCodeDataFromAzDOAPI(url);
+  const codeCard: CodeCard = await reqCodeDataFromAzDOAPI(url, token);
   if (!codeCard) {
     return;
   }

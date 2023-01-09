@@ -1,18 +1,55 @@
 import { CloudAdapter, TurnContext } from "botbuilder";
+import { UserTokenClient } from "botframework-connector";
+import { Activity, TokenResponse } from "botframework-schema";
 
-export async function getTokenFromAzureOauthConnection(context: TurnContext, query: any) {
-  const adapter = context.adapter as CloudAdapter;
-  const userTokenClient = context.turnState.get(adapter.UserTokenClientKey);
+export class Credentials {
+  private client: UserTokenClient;
+  private activity: Activity;
+  private connectionName = process.env.ConnectionName;
 
-  const magicCode =
-    query.state && Number.isInteger(Number(query.state)) ? query.state : "";
+  constructor(context: TurnContext) {
+    const adapter = context.adapter as CloudAdapter;
+    this.client = context.turnState.get(
+      adapter.UserTokenClientKey
+    ) as UserTokenClient;
+    this.activity = context.activity;
+  }
 
-  const tokenResponse = await userTokenClient.getUserToken(
-    context.activity.from.id,
-    process.env.ConnectionName,
-    context.activity.channelId,
-    magicCode
-  );
-  console.log(JSON.stringify(tokenResponse));
-  return tokenResponse;
+  async getUserToken(): Promise<TokenResponse> {
+    const tokenResponse = await this.client.getUserToken(
+      this.activity.from.id,
+      this.connectionName,
+      this.activity.channelId,
+      ""
+    );
+    return tokenResponse;
+  }
+
+  async getSignInComposeExtension(): Promise<any> {
+    // Retrieve the OAuth Sign in Link to use in the MessagingExtensionResult Suggested Actions
+    const signInLink = await this.getSignInLink();
+    return {
+      composeExtension: {
+        type: "auth",
+        suggestedActions: {
+          actions: [
+            {
+              type: "openUrl",
+              value: signInLink,
+              title: "Bot Service OAuth",
+            },
+          ],
+        },
+      },
+    };
+  }
+
+  async getSignInLink(): Promise<string> {
+    const { signInLink } = await this.client.getSignInResource(
+      this.connectionName,
+      this.activity,
+      ""
+    );
+    return signInLink;
+  }
 }

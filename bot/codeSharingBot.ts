@@ -5,20 +5,22 @@ import {
   Attachment,
 } from "botbuilder";
 import { CodeCard } from "./helper/codeCard";
-import { 
+import {
   reqCodeDataFromGitHubAPI,
   reqCodeDataFromAzDOAPI,
- } from "./helper/reqHelper";
+} from "./helper/reqHelper";
 
 export class CodeSharingBot extends TeamsActivityHandler {
-
-  public async handleTeamsAppBasedLinkQuery(context: TurnContext, query: any): Promise<any> {
+  public async handleTeamsAppBasedLinkQuery(
+    context: TurnContext,
+    query: any
+  ): Promise<any> {
     // Link obtained has `amp;` in the url if the url contains `&`, simply replace it.
-    const url = query.url.replace(/&amp;/g,'&');
-    // Unfurling link contains `github`. 
-    if (url.includes('github.com')){
+    const url = query.url.replace(/&amp;/g, "&");
+    // Unfurling link contains `github`.
+    if (url.includes("github.com")) {
       return await handleGitHubUrl(url);
-    } 
+    }
     // else if (url.includes('.visualstudio.com')){
     //   return await handleAzDOUrl(url);
     // }
@@ -38,14 +40,17 @@ export class CodeSharingBot extends TeamsActivityHandler {
   }
 }
 
-async function createCardCommand(context: TurnContext, action: any): Promise<any> {
+async function createCardCommand(
+  context: TurnContext,
+  action: any
+): Promise<any> {
   // The user has chosen to create a card by choosing the 'Create Card' context menu command.
   const data = action.data;
   const url: string = data.URL;
   // If URL contains `github`, use GitHub API route.
-  if (url.includes('github.com')){
+  if (url.includes("github.com")) {
     return await handleGitHubUrl(url);
-  }    
+  }
   // else if (url.includes('.visualstudio.com')){
   //   return await handleAzDOUrl(url);
   // }
@@ -56,33 +61,34 @@ async function createCardCommand(context: TurnContext, action: any): Promise<any
  * @param url
  * @returns composeExtension for link unfurling displaying.
  */
-async function handleGitHubUrl(url: string){
+async function handleGitHubUrl(url: string) {
   var card: Attachment;
   // Option to choose whether to use GitHub self-rendered HTML or not.
-  const codeCard: CodeCard =  await reqCodeDataFromGitHubAPI(url);
-  if (!codeCard){
+  const codeCard: CodeCard = await reqCodeDataFromGitHubAPI(url);
+  if (!codeCard) {
     return;
   }
-  card = CardFactory.heroCard(
-    '',
-    undefined,
-    [
-      {
-        title: 'View in GitHub',
-        type: 'openUrl',
-        value: codeCard.originUrl
-      },
-      {
-        title: 'Open in vscode.dev',
-        type: 'openUrl',
-        value: codeCard.webEditorUrl
-      }
-    ]);
+  card = CardFactory.heroCard("", undefined, [
+    {
+      title: "View in GitHub",
+      type: "openUrl",
+      value: codeCard.originUrl,
+    },
+    {
+      title: "Open in vscode.dev",
+      type: "openUrl",
+      value: codeCard.webEditorUrl,
+    },
+  ]);
   card.content.title = codeCard.title;
   card.content.subtitle = codeCard.subtitle;
   card.content.text = codeCard.text;
-  const attachment = { contentType: card.contentType, content: card.content, preview: card };
-  
+  const attachment = {
+    contentType: card.contentType,
+    content: card.content,
+    preview: card,
+  };
+
   return {
     composeExtension: {
       type: "result",
@@ -97,32 +103,33 @@ async function handleGitHubUrl(url: string){
  * @param url
  * @returns composeExtension for link unfurling displaying.
  */
- async function handleAzDOUrl(url: string){
+async function handleAzDOUrl(url: string) {
   var card: Attachment;
-  const codeCard: CodeCard =  await reqCodeDataFromAzDOAPI(url);
-  if (!codeCard){
+  const codeCard: CodeCard = await reqCodeDataFromAzDOAPI(url);
+  if (!codeCard) {
     return;
   }
-  card = CardFactory.heroCard(
-    '',
-    undefined,
-    [
-      {
-        title: 'View in Azure DevOps',
-        type: 'openUrl',
-        value: codeCard.originUrl
-      },
-      {
-        title: 'Open in vscode.dev',
-        type: 'openUrl',
-        value: codeCard.webEditorUrl
-      }
-    ]);
+  card = CardFactory.heroCard("", undefined, [
+    {
+      title: "View in Azure DevOps",
+      type: "openUrl",
+      value: codeCard.originUrl,
+    },
+    {
+      title: "Open in vscode.dev",
+      type: "openUrl",
+      value: codeCard.webEditorUrl,
+    },
+  ]);
   card.content.title = codeCard.title;
   card.content.subtitle = codeCard.subtitle;
   card.content.text = codeCard.text;
-  const attachment = { contentType: card.contentType, content: card.content, preview: card };
-  
+  const attachment = {
+    contentType: card.contentType,
+    content: card.content,
+    preview: card,
+  };
+
   return {
     composeExtension: {
       type: "result",

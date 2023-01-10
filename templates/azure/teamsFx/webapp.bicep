@@ -16,7 +16,7 @@ resource botWebAppSettings 'Microsoft.Web/sites/config@2021-02-01' = {
       MicrosoftAppId: botAadAppClientId // ID of your bot
       MicrosoftAppPassword: botAadAppClientSecret // Secret of your bot
       MicrosoftAppType: 'MultiTenant'
-      ConnectionName: 'azdo2'
+      ConnectionName: provisionOutputs.botOutput.value.connectionName
       IDENTITY_ID: provisionOutputs.identityOutput.value.identityClientId // User assigned identity id, the identity is used to access other Azure resources
     }, currentAppSettings)
 }

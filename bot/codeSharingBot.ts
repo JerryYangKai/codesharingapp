@@ -24,7 +24,7 @@ export class CodeSharingBot extends TeamsActivityHandler {
       return await handleGitHubUrl(url);
     } else if (url.includes(".visualstudio.com")) {
       const credentials = new Credentials(context);
-      const tokenResponse = await credentials.getUserToken();
+      const tokenResponse = await credentials.getUserToken(query);
       if (!tokenResponse || !tokenResponse.token) {
         // There is no token, so the user has not signed in yet.
         return credentials.getSignInComposeExtension();
@@ -59,7 +59,7 @@ async function createCardCommand(
     return await handleGitHubUrl(url);
   } else if (url.includes(".visualstudio.com")) {
     const credentials = new Credentials(context);
-    const tokenResponse = await credentials.getUserToken();
+    const tokenResponse = await credentials.getUserToken(action);
     if (!tokenResponse || !tokenResponse.token) {
       // There is no token, so the user has not signed in yet.
       return credentials.getSignInComposeExtension();

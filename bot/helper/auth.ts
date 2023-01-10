@@ -15,12 +15,14 @@ export class Credentials {
     this.activity = context.activity;
   }
 
-  async getUserToken(): Promise<TokenResponse> {
+  async getUserToken(query: any): Promise<TokenResponse> {
+    const magicCode =
+      query?.state && Number.isInteger(Number(query.state)) ? query.state : "";
     const tokenResponse = await this.client.getUserToken(
       this.activity.from.id,
       this.connectionName,
       this.activity.channelId,
-      ""
+      magicCode
     );
     return tokenResponse;
   }

@@ -9,9 +9,9 @@ export class Credentials {
 
   constructor(context: TurnContext) {
     const adapter = context.adapter as CloudAdapter;
-    this.client = context.turnState.get(
+    this.client = context.turnState.get<UserTokenClient>(
       adapter.UserTokenClientKey
-    ) as UserTokenClient;
+    );
     this.activity = context.activity;
   }
 

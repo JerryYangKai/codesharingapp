@@ -3,8 +3,13 @@ import {
   CardFactory,
   TurnContext,
   Attachment,
-  CloudAdapter,
 } from "botbuilder";
+import {
+  AppBasedLinkQuery,
+  MessagingExtensionAction,
+  MessagingExtensionActionResponse,
+  MessagingExtensionResponse,
+} from "botframework-schema";
 import { Credentials } from "./helper/auth";
 import { CodeCard } from "./helper/codeCard";
 import {
@@ -15,28 +20,17 @@ import {
 export class CodeSharingBot extends TeamsActivityHandler {
   public async handleTeamsAppBasedLinkQuery(
     context: TurnContext,
-    query: any
+    query: AppBasedLinkQuery
   ): Promise<any> {
     // Link obtained has `amp;` in the url if the url contains `&`, simply replace it.
     const url = query.url.replace(/&amp;/g, "&");
-    // Unfurling link contains `github`.
-    if (url.includes("github.com")) {
-      return await handleGitHubUrl(url);
-    } else if (url.includes(".visualstudio.com")) {
-      const credentials = new Credentials(context);
-      const tokenResponse = await credentials.getUserToken(query);
-      if (!tokenResponse || !tokenResponse.token) {
-        // There is no token, so the user has not signed in yet.
-        return credentials.getSignInComposeExtension();
-      }
-      return await handleAzDOUrl(url, tokenResponse.token);
-    }
+    return unfurlingUrl(url, context, query);
   }
 
   // Using Action as a backup.
   public async handleTeamsMessagingExtensionSubmitAction(
     context: TurnContext,
-    action: any
+    action: MessagingExtensionAction
   ): Promise<any> {
     switch (action.commandId) {
       case "createCard":
@@ -49,17 +43,32 @@ export class CodeSharingBot extends TeamsActivityHandler {
 
 async function createCardCommand(
   context: TurnContext,
-  action: any
-): Promise<any> {
+  action: MessagingExtensionAction
+): Promise<MessagingExtensionActionResponse> {
   // The user has chosen to create a card by choosing the 'Create Card' context menu command.
   const data = action.data;
   const url: string = data.URL;
+  return unfurlingUrl(url, context, action);
+}
+
+/**
+ * Function to get attachment for link unfurling displaying.
+ * @param url
+ * @param context
+ * @param query object that contains the magic code for OAuth flow
+ * @returns composeExtension for link unfurling displaying.
+ */
+async function unfurlingUrl(
+  url: string,
+  context: TurnContext,
+  query: any
+): Promise<MessagingExtensionResponse> {
   // If URL contains `github`, use GitHub API route.
   if (url.includes("github.com")) {
     return await handleGitHubUrl(url);
   } else if (url.includes(".visualstudio.com")) {
     const credentials = new Credentials(context);
-    const tokenResponse = await credentials.getUserToken(action);
+    const tokenResponse = await credentials.getUserToken(query);
     if (!tokenResponse || !tokenResponse.token) {
       // There is no token, so the user has not signed in yet.
       return credentials.getSignInComposeExtension();
@@ -68,12 +77,9 @@ async function createCardCommand(
   }
 }
 
-/**
- * Function to get attachment for link unfurling displaying.
- * @param url
- * @returns composeExtension for link unfurling displaying.
- */
-async function handleGitHubUrl(url: string) {
+async function handleGitHubUrl(
+  url: string
+): Promise<MessagingExtensionResponse> {
   var card: Attachment;
   // Option to choose whether to use GitHub self-rendered HTML or not.
   const codeCard: CodeCard = await reqCodeDataFromGitHubAPI(url);
@@ -110,12 +116,10 @@ async function handleGitHubUrl(url: string) {
   };
 }
 
-/**
- * Function to get attachment for link unfurling displaying.
- * @param url
- * @returns composeExtension for link unfurling displaying.
- */
-async function handleAzDOUrl(url: string, token?: string) {
+async function handleAzDOUrl(
+  url: string,
+  token?: string
+): Promise<MessagingExtensionResponse> {
   var card: Attachment;
   const codeCard: CodeCard = await reqCodeDataFromAzDOAPI(url, token);
   if (!codeCard) {

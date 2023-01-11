@@ -173,15 +173,17 @@ async function reqInfoFromAzDOAPI(
   ref: string,
   accessToken?: string
 ) {
-  const token = accessToken ? `Bearer ${accessToken}` : getAzDOToken();
+  const headers = accessToken
+    ? {
+        Authorization: `Bearer ${accessToken}`,
+      }
+    : undefined;
   const reqURL = `https://dev.azure.com/${orgName}/${projectName}/_apis/sourceProviders/TfsGit/filecontents?repository=${repoName}&commitOrBranch=${ref}&path=${path}&api-version=7.1-preview.1`;
   var content: string;
   await axios({
     baseURL: reqURL,
     method: "get",
-    headers: {
-      Authorization: token,
-    },
+    headers: headers,
   }).then((response) => {
     content = response.data;
   });
@@ -280,14 +282,4 @@ async function renderCodeWithAPI(contentToRender: string) {
   });
   // console.log(content);
   return content;
-}
-
-/**
- * Function to get Azure DevOps Token from process.env
- * Set in `.env.teamsfx.local`
- * @returns github token for authorization.
- */
-function getAzDOToken() {
-  const accessToken = `Basic ${process.env.AzDO_TOKEN}`;
-  return accessToken;
 }

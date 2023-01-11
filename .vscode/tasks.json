@@ -4,9 +4,6 @@
         {
             "label": "Pre Debug Check & Start All",
             "dependsOn": [
-                "validate local prerequisites",
-                "start ngrok",
-                "prepare local environment",
                 "Start All"
             ],
             "dependsOrder": "sequence"

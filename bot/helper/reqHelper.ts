@@ -107,7 +107,7 @@ async function reqInfoFromGitHubAPI(
  * @param useGitHubRendered option to choose whether to get rendered HTML directly from GitHub
  * @returns
  */
-export async function reqCodeDataFromAzDOAPI(url: string) {
+export async function reqCodeDataFromAzDOAPI(url: string, token?: string) {
   // Typically, An Azure DevOps link URL will be
   // `https://org.visualstudio.com/project/_git/repo?path=&version=&line=&lineEnd=`
   // TODO: using lib or regular expression handle the link
@@ -138,7 +138,8 @@ export async function reqCodeDataFromAzDOAPI(url: string) {
     projectName,
     repoName,
     path,
-    ref
+    ref,
+    token
   );
   const contentToRender = segmentContent(rawContent, startLine, endLine);
   const language = getLanguage(path);
@@ -169,17 +170,20 @@ async function reqInfoFromAzDOAPI(
   projectName: string,
   repoName: string,
   path: string,
-  ref: string
+  ref: string,
+  accessToken?: string
 ) {
-  const token = getAzDOToken();
+  const headers = accessToken
+    ? {
+        Authorization: `Bearer ${accessToken}`,
+      }
+    : undefined;
   const reqURL = `https://dev.azure.com/${orgName}/${projectName}/_apis/sourceProviders/TfsGit/filecontents?repository=${repoName}&commitOrBranch=${ref}&path=${path}&api-version=7.1-preview.1`;
   var content: string;
   await axios({
     baseURL: reqURL,
     method: "get",
-    headers: {
-      Authorization: token,
-    },
+    headers: headers,
   }).then((response) => {
     content = response.data;
   });
@@ -278,14 +282,4 @@ async function renderCodeWithAPI(contentToRender: string) {
   });
   // console.log(content);
   return content;
-}
-
-/**
- * Function to get Azure DevOps Token from process.env
- * Set in `.env.teamsfx.local`
- * @returns github token for authorization.
- */
-function getAzDOToken() {
-  const accessToken = `Basic ${process.env.AzDO_TOKEN}`;
-  return accessToken;
 }

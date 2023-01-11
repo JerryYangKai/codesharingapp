@@ -40,3 +40,7 @@ module botProvision './provision/botservice.bicep' = {
     botEndpoint: webAppProvision.outputs.webAppEndpoint
   }
 }
+
+output botOutput object = {
+  connectionName: botProvision.outputs.botConnectionName
+}

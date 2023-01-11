@@ -66,6 +66,7 @@ This Teams App is used to display formatted code in Teams with Adaptive Card.
 ## Link Unfurling
 
 - GitHub permalink: It is like `https://github.com/OfficeDev/TeamsFx-Samples/blob/master/test.py#L1-L6?x=a&y=b`.
+- Azure DevOps permalink: It is like `https://<org>.visualstudio.com/<org>/_git/<repo>?path=<path-to-code>&version=GBmain&line=1&lineEnd=10&lineStartColumn=1&lineEndColumn=2&lineStyle=plain&_a=contents`.
 
 ## Create Card
 

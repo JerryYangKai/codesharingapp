@@ -44,3 +44,15 @@ module botProvision './provision/botservice.bicep' = {
 output botOutput object = {
   connectionName: botProvision.outputs.botConnectionName
 }
+
+module appInsightsProvision './provision/appInsights.bicep' = {
+  name: 'appInsightsProvision'
+  params: {
+    provisionParameters: provisionParameters
+  }
+}
+
+output appInsightsOutput object = {
+  appId: appInsightsProvision.outputs.appId
+  connectionString: appInsightsProvision.outputs.connectionString
+}

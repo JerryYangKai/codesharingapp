@@ -1,7 +1,9 @@
 import axios from "axios";
+import hljs from "highlight.js";
 import { Buffer } from "buffer";
 import { CodeCard } from "./codeCard";
-import { DefaultLineSetting } from "./constant";
+import { DefaultLineSetting, DefaultCodeStyle } from "./constant";
+const inlineCss = require("inline-css");
 
 /**
  *
@@ -268,18 +270,9 @@ async function renderWithGitHubMdAPI(contentToRender: string) {
  * @returns HTML string of the content.
  */
 async function renderCodeWithAPI(contentToRender: string) {
-  // console.log(contentToRender)
-  var content = await axios({
-    baseURL: "http://hilite.me/api",
-    method: "get",
-    params: {
-      code: contentToRender,
-      lexer: "ts",
-      style: "borland",
-    },
-  }).then((response) => {
-    return response.data;
-  });
-  // console.log(content);
-  return content;
+  var content = hljs.highlightAuto(contentToRender);
+  return inlineCss(
+    DefaultCodeStyle.vsCSSStyle + content.value + "</code></pre></span>",
+    { url: "file://" }
+  );
 }

@@ -1,71 +1,58 @@
 {
-    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.14/MicrosoftTeams.schema.json",
-    "manifestVersion": "1.14",
-    "version": "1.0.0",
-    "id": "{{state.fx-resource-appstudio.teamsAppId}}",
-    "packageName": "com.microsoft.teams.extension",
-    "developer": {
-        "name": "Teams App, Inc.",
-        "websiteUrl": "https://www.example.com",
-        "privacyUrl": "https://www.example.com/termofuse",
-        "termsOfUseUrl": "https://www.example.com/privacy"
-    },
-    "icons": {
-        "color": "{{config.manifest.icons.color}}",
-        "outline": "{{config.manifest.icons.outline}}"
-    },
-    "name": {
-        "short": "{{config.manifest.appName.short}}",
-        "full": "{{config.manifest.appName.full}}"
-    },
-    "description": {
-        "short": "{{config.manifest.description.short}}",
-        "full": "{{config.manifest.description.full}}"
-    },
-    "accentColor": "#FFFFFF",
-    "bots": [],
-    "composeExtensions": [
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.14/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.14",
+  "version": "1.0.0",
+  "id": "{{state.fx-resource-appstudio.teamsAppId}}",
+  "packageName": "com.microsoft.teams.extension",
+  "developer": {
+    "name": "Microsoft Corporation"
+  },
+  "icons": {
+    "color": "{{config.manifest.icons.color}}",
+    "outline": "{{config.manifest.icons.outline}}"
+  },
+  "name": {
+    "short": "{{config.manifest.appName.short}}",
+    "full": "{{config.manifest.appName.full}}"
+  },
+  "description": {
+    "short": "{{config.manifest.description.short}}",
+    "full": "{{config.manifest.description.full}}"
+  },
+  "accentColor": "#FFFFFF",
+  "bots": [],
+  "composeExtensions": [
+    {
+      "botId": "{{state.fx-resource-bot.botId}}",
+      "commands": [
         {
-            "botId": "{{state.fx-resource-bot.botId}}",
-            "commands": [
-                {
-                    "id": "createCard",
-                    "context": [
-                        "compose"
-                    ],
-                    "description": "Command to run action to create a Card from Compose Box",
-                    "title": "Code Card",
-                    "type": "action",
-                    "parameters": [
-                        {
-                            "name": "URL",
-                            "title": "URL for code card",
-                            "description": "URL for code card, copied from GitHub permalink",
-                            "inputType": "text"
-                        }
-                    ]
-                }
-            ],
-            "messageHandlers": [
-                {
-                    "type": "link",
-                    "value": {
-                        "domains": [
-                            "github.com",
-                            "*.visualstudio.com"
-                        ]
-                    }
-                }
-            ]
+          "id": "createCard",
+          "context": ["compose"],
+          "description": "Command to run action to create a Card from Compose Box",
+          "title": "Code Card",
+          "type": "action",
+          "parameters": [
+            {
+              "name": "URL",
+              "title": "Link for code card",
+              "description": "Copied from GitHub permalink or Azure DevOps link",
+              "inputType": "text"
+            }
+          ]
         }
-    ],
-    "configurableTabs": [],
-    "staticTabs": [],
-    "permissions": [
-        "identity",
-        "messageTeamMembers"
-    ],
-    "validDomains": [
-        "token.botframework.com"
-    ]
+      ],
+      "messageHandlers": [
+        {
+          "type": "link",
+          "value": {
+            "domains": ["github.com", "*.visualstudio.com"]
+          }
+        }
+      ]
+    }
+  ],
+  "configurableTabs": [],
+  "staticTabs": [],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["token.botframework.com"]
 }

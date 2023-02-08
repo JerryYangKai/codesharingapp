@@ -272,7 +272,11 @@ async function renderWithGitHubMdAPI(contentToRender: string) {
 async function renderCodeWithAPI(contentToRender: string) {
   var content = hljs.highlightAuto(contentToRender);
   return inlineCss(
-    DefaultCodeStyle.vsCSSStyle + content.value + "</code></pre></span>",
+    "<span>" +
+      DefaultCodeStyle.vsStyle +
+      "<pre><code>" +
+      content.value +
+      "</code></pre></span>",
     { url: "file://" }
   );
 }

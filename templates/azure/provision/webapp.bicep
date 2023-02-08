@@ -28,6 +28,11 @@ resource webApp 'Microsoft.Web/sites@2021-02-01' = {
     keyVaultReferenceIdentity: userAssignedIdentityId // Use given user assigned identity to access Key Vault
     httpsOnly: true
     siteConfig: {
+      healthCheckPath: '/api/health'
+      requestTracingEnabled: true
+      httpLoggingEnabled: true
+      logsDirectorySizeLimit: 100
+      detailedErrorLoggingEnabled: true
       alwaysOn: true
       appSettings: [
         {

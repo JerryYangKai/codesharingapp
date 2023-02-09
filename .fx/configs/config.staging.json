@@ -1,18 +1,18 @@
 {
-    "$schema": "https://aka.ms/teamsfx-env-config-schema",
-    "description": "You can customize the TeamsFx config for different environments. Visit https://aka.ms/teamsfx-env-config to learn more about this.",
-    "manifest": {
-        "appName": {
-            "short": "Code",
-            "full": "CodeCard"
-        },
-        "description": {
-            "short": "Sharing code card in Teams",
-            "full": "Sharing GitHub link then unfurling to code card in Teams Message Box"
-        },
-        "icons": {
-            "color": "resources/color.png",
-            "outline": "resources/outline.png"
-        }
+  "$schema": "https://aka.ms/teamsfx-env-config-schema",
+  "description": "You can customize the TeamsFx config for different environments. Visit https://aka.ms/teamsfx-env-config to learn more about this.",
+  "manifest": {
+    "appName": {
+      "short": "Code Card",
+      "full": "Code Card"
+    },
+    "description": {
+      "short": "Render context and syntax for code for GitHub and Azure DevOps repos with links",
+      "full": "This app takes links to lines of code and displays the code with better formatting and context in the message. It shows the source control branch associated with those code lines, and generates a one-click way to open the entire repository for further context of that code snippet. The Code Card work for links generated to reference code in GitHub public repos and all Azure DevOps repos."
+    },
+    "icons": {
+      "color": "resources/color.png",
+      "outline": "resources/outline.png"
     }
+  }
 }

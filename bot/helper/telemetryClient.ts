@@ -9,7 +9,8 @@ export function setupApplicationInsights(): void {
   try {
     setup().start();
   } catch (e) {
-    console.warn(JSON.stringify(e));
+    // applicationinsights package prints information when setup fails
+    return;
   }
   TelemetryReporter = defaultClient;
 }
@@ -17,7 +18,7 @@ export function setupApplicationInsights(): void {
 export const TelemetryMiddleware: MiddlewareHandler = async (context, next) => {
   await next();
   const eventName = TelemetryConstants.EventNames.usage;
-  TelemetryReporter.trackEvent({
+  TelemetryReporter?.trackEvent({
     name: eventName,
     properties: {
       id: context.activity.from.id,

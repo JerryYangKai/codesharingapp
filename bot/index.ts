@@ -12,6 +12,7 @@ import {
 
 // This bot's main dialog.
 import { CodeSharingBot } from "./codeSharingBot";
+import { setupApplicationInsights, TelemetryMiddleware } from "./helper/telemetryClient";
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
   process.env as ConfigurationBotFrameworkAuthenticationOptions
@@ -47,6 +48,10 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
 
 // Set the onTurnError for the singleton BotFrameworkAdapter.
 adapter.onTurnError = onTurnErrorHandler;
+adapter.use(TelemetryMiddleware);
+
+// Setup application insights for telemetry.
+setupApplicationInsights();
 
 // Create the bot that will handle incoming messages.
 const bot = new CodeSharingBot();
